@@ -1,0 +1,40 @@
+name: CD Docker Image + DockerHub push
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build and Push Docker Compose setup for React App
+      run: |
+        echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+        # Build and tag the Docker Compose setup for React App
+        docker-compose -f docker-compose.yml build react-app
+
+        # Push the Docker Compose setup for React App
+        docker-compose -f docker-compose.yml push react-app
+
+    - name: Build and Push Docker Compose setup for Socket Server
+      run: |
+        echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+        # Build and tag the Docker Compose setup for Socket Server
+        docker-compose -f docker-compose.yml build socket-server
+
+        # Push the Docker Compose setup for Socket Server
+        docker-compose -f docker-compose.yml push socket-server
